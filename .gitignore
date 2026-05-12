@@ -1,3 +1,6 @@
 ncs2_boot
+ncs2_infer
+ncs2_mkblob
 *.o
 *.mvcmd
+*.blob

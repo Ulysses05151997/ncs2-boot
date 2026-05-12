@@ -2,18 +2,21 @@ CC      = gcc
 CFLAGS  = -Wall -Wextra -O2
 LDFLAGS = -lusb-1.0
 
-TARGET  = ncs2_boot
-SRC     = src/ncs2_boot.c
+all: ncs2_boot ncs2_infer ncs2_mkblob
 
-all: $(TARGET)
-
-$(TARGET): $(SRC)
+ncs2_boot: src/ncs2_boot.c
 	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
 
-clean:
-	rm -f $(TARGET)
+ncs2_infer: src/ncs2_infer.c
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
 
-install: $(TARGET)
-	install -m 755 $(TARGET) /usr/local/bin/
+ncs2_mkblob: src/ncs2_mkblob.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+clean:
+	rm -f ncs2_boot ncs2_infer ncs2_mkblob
+
+install: ncs2_boot ncs2_infer
+	install -m 755 ncs2_boot ncs2_infer /usr/local/bin/
 
 .PHONY: all clean install
