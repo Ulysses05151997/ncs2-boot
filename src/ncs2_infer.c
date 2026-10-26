@@ -916,6 +916,10 @@ static void print_output(const uint8_t *data, uint32_t size)
 
 int main(int argc, char *argv[])
 {
+    /* Line-buffer stdout so progress and error messages stay in order
+     * when output is piped (for example through tee into a log). */
+    setvbuf(stdout, NULL, _IOLBF, 0);
+
     if (argc < 2) {
         fprintf(stderr,
             "Usage: %s [options] <model.blob> [input.bin [output.bin]]\n"
@@ -1085,11 +1089,15 @@ int main(int argc, char *argv[])
     if (ncs2_get_capabilities(dm_stream, &caps) < 0)
         goto cleanup;
 
-    printf("  Firmware version: %u.%u.%u.%u\n",
+    /* Printed in hex, the same way OpenVINO 2022.3 logs it
+     * (mvnc_api.c: "Device FW version: %x.%x.%x.%x"). */
+    printf("  Firmware version: %x.%x.%x.%x\n",
            caps.fw_version[0], caps.fw_version[1],
            caps.fw_version[2], caps.fw_version[3]);
-    printf("  Max graphs: %u  Max FIFOs: %u  Memory: %u bytes\n",
-           caps.max_graphs, caps.max_fifos, caps.max_memory);
+    printf("  Max graphs: %u  Max FIFOs: %u\n",
+           caps.max_graphs, caps.max_fifos);
+    printf("  Memory capacity: %u bytes (%.1f MiB)\n",
+           caps.max_memory, caps.max_memory / 1048576.0);
 
     /* Open graphMonitor stream */
     uint32_t gm_stream;
