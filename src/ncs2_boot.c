@@ -197,6 +197,10 @@ static int wait_for_boot(libusb_context *ctx)
 
 int main(int argc, char *argv[])
 {
+    /* Line-buffer stdout so progress and error messages stay in order
+     * when output is piped (for example through tee into a log). */
+    setvbuf(stdout, NULL, _IOLBF, 0);
+
     if (argc < 2) {
         fprintf(stderr,
                 "Usage: %s <firmware.mvcmd>\n\n"
@@ -314,7 +318,9 @@ int main(int argc, char *argv[])
     } else {
         fprintf(stderr, "\nDevice did not re-enumerate within %d seconds.\n"
                         "The firmware may have failed to boot, or the device\n"
-                        "may need more time. Check 'lsusb' manually.\n",
+                        "may need more time. Check 'lsusb' manually.\n"
+                        "If the stick vanished from 'lsusb' entirely, see\n"
+                        "\"Troubleshooting\" in README.md.\n",
                 BOOT_WAIT_SEC);
         return 1;
     }
